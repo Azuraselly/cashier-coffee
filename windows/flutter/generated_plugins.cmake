@@ -4,7 +4,9 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   app_links
+  file_selector_windows
   printing
+  rive_native
   url_launcher_windows
 )
 

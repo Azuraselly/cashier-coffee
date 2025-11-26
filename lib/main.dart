@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+// import 'package:supabase_flutter/supabase_flutter.dart';
 import 'providers/auth_provider.dart';
 import 'services/supabase_client.dart';
-import 'screens/auth/login_screen.dart';
-import 'screens/splashscreen.dart';        // Import SplashScreen
-import 'screens/dashboard/dashboard_screen.dart';
+// import 'screens/auth/login_screen.dart';
+// import 'screens/splashscreen.dart';   
+import 'screens/produk/ProdukManagementScreen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +28,7 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Enjoyy Coffee POS',
         theme: ThemeData(
           primarySwatch: Colors.brown, // Ganti ke coklat biar cocok tema kopi
@@ -35,12 +36,12 @@ class MyApp extends StatelessWidget {
           fontFamily: 'Inter',
           scaffoldBackgroundColor: const Color(0xFFFAFAFA),
         ),
-        home: const SplashScreen(), 
-        debugShowCheckedModeBanner: false,
-        routes: {
-          '/login': (_) => const LoginScreen(),
-          '/dashboard': (_) => const DashboardScreen(),
-        },
+        home: const ProdukManagementScreen(), 
+        // debugShowCheckedModeBanner: false,
+        // routes: {
+        //   '/login': (_) => const LoginScreen(),
+        //   '/dashboard': (_) => const DashboardScreen(),
+        // },
       ),
     );
   }

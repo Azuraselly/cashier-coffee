@@ -153,9 +153,6 @@ class _SplashScreenState extends State<SplashScreen>
                                 ),
                               ),
                             ),
-
-                            // Uap kopi (steam effect)
-                           
                           ],
                         ),
                       ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kasir/services/auth_service.dart';
 
-
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
   bool _isLoggedIn = false;

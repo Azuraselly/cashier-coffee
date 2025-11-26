@@ -21,6 +21,7 @@ class AuthService {
     final response = await _client.auth.signUp(
       email: email,
       password: password,
+      
     );
 
     if (response.user != null) {
