@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:kasir/utils/constants.dart';
 import 'package:kasir/screens/dashboard/dashboard_screen.dart';
 import 'package:kasir/screens/produk/ProdukManagementScreen.dart';
+import 'package:kasir/screens/laporan/laporan_penjualan_screen.dart';
 // import 'package:kasir/screens/cashier/cashier_screen.dart';
 // import 'package:kasir/screens/customer/customer_screen.dart';
-// import 'package:kasir/screens/stock/stock_screen.dart';
-// import 'package:kasir/screens/report/report_screen.dart';
+import 'package:kasir/screens/stok/stock_management_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SidebarDrawer extends StatelessWidget {
@@ -16,8 +16,8 @@ class SidebarDrawer extends StatelessWidget {
     'Product Management': ProdukManagementScreen(),
     // 'Customer Management': CustomerScreen(),
     // 'Cashier': CashierScreen(),
-    // 'Stock Management': StockScreen(),
-    // 'Report and Print': ReportScreen(),
+    'Stock Management': StockManagementScreen(),
+    'Report and Print': LaporanPenjualanScreen(),
   };
   @override
   Widget build(BuildContext context) {

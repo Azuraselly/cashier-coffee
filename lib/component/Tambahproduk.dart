@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart';          // Tambah ini untuk kIsWeb
+import 'package:flutter/foundation.dart'; // Tambah ini untuk kIsWeb
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kasir/models/produk.dart';
@@ -11,11 +11,10 @@ class BottomSheetTambahProduk extends StatefulWidget {
   final ProdukModel? produkEdit;
 
   const BottomSheetTambahProduk({
-  Key? key,
-  required this.onSuccess,
-  this.produkEdit,
-}) : super(key: key);
-
+    Key? key,
+    required this.onSuccess,
+    this.produkEdit,
+  }) : super(key: key);
 
   @override
   State<BottomSheetTambahProduk> createState() =>
@@ -95,22 +94,25 @@ class _BottomSheetTambahProdukState extends State<BottomSheetTambahProduk> {
                   borderRadius: BorderRadius.circular(16),
                   child: image != null
                       ? (kIsWeb
-                          // Web: pakai Image.network dengan object URL dari XFile
-                          ? Image.network(
-                              image!.path,
-                              fit: BoxFit.cover,
-                              width: 140,
-                              height: 140,
-                            )
-                          // Mobile: pakai Image.file
-                          : Image.file(
-                              File(image!.path),
-                              fit: BoxFit.cover,
-                              width: 140,
-                              height: 140,
-                            ))
-                      : const Icon(Icons.add_a_photo,
-                          size: 50, color: Colors.grey),
+                            // Web: pakai Image.network dengan object URL dari XFile
+                            ? Image.network(
+                                image!.path,
+                                fit: BoxFit.cover,
+                                width: 140,
+                                height: 140,
+                              )
+                            // Mobile: pakai Image.file
+                            : Image.file(
+                                File(image!.path),
+                                fit: BoxFit.cover,
+                                width: 140,
+                                height: 140,
+                              ))
+                      : const Icon(
+                          Icons.add_a_photo,
+                          size: 50,
+                          color: Colors.grey,
+                        ),
                 ),
               ),
             ),
@@ -118,60 +120,232 @@ class _BottomSheetTambahProdukState extends State<BottomSheetTambahProduk> {
 
             // ================== FORM INPUT ==================
             TextField(
+              style: const TextStyle(
+                color: Colors.black,
+                fontFamily: 'Poppins',
+              ),
               controller: namaCtrl,
-              decoration: const InputDecoration(
-                labelText: "Nama Produk *",
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: descCtrl,
-              decoration: const InputDecoration(
-                labelText: "Deskripsi",
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: hargaCtrl,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: "Harga *",
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: stokCtrl,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: "Stok *",
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: minStokCtrl,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: "Min Stok",
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Color(0XFFF2F2F2),
+                labelText: "Nama Produk ",
+                labelStyle: const TextStyle(
+                  fontFamily: 'Poppins',
+                  color: Colors.black,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(color: Color(0XFFF2F2F2)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(
+                    color: Color(0xFFB38686),
+                    width: 2,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 18,
+                ),
               ),
             ),
             const SizedBox(height: 12),
 
+            TextField(
+              controller: descCtrl,
+              style: const TextStyle(
+                color: Colors.black,
+                fontFamily: 'Poppins',
+              ),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: const Color(0xFFF2F2F2),
+                labelText: "Deskripsi",
+                labelStyle: const TextStyle(
+                  fontFamily: 'Poppins',
+                  color: Colors.black,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(color: Color(0xFFF2F2F2)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(
+                    color: Color(0xFFB38686),
+                    width: 2.5,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 18,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            TextField(
+              controller: hargaCtrl,
+              keyboardType: TextInputType.number,
+              style: const TextStyle(
+                color: Colors.black,
+                fontFamily: 'Poppins',
+              ),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: const Color(0xFFF2F2F2),
+                labelText: "Harga ",
+                labelStyle: const TextStyle(
+                  fontFamily: 'Poppins',
+                  color: Colors.black,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(color: Color(0xFFF2F2F2)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(
+                    color: Color(0xFFB38686),
+                    width: 2.5,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 18,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            TextField(
+              controller: stokCtrl,
+              keyboardType: TextInputType.number,
+              style: const TextStyle(
+                color: Colors.black,
+                fontFamily: 'Poppins',
+              ),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: const Color(0xFFF2F2F2),
+                labelText: "Stok *",
+                labelStyle: const TextStyle(
+                  fontFamily: 'Poppins',
+                  color: Colors.black,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(color: Color(0xFFF2F2F2)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(
+                    color: Color(0xFFB38686),
+                    width: 2.5,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 18,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            TextField(
+              controller: minStokCtrl,
+              keyboardType: TextInputType.number,
+              style: const TextStyle(
+                color: Colors.black,
+                fontFamily: 'Poppins',
+              ),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: const Color(0xFFF2F2F2),
+                labelText: "Min Stok",
+                labelStyle: const TextStyle(
+                  fontFamily: 'Poppins',
+                  color: Colors.black,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(color: Color(0xFFF2F2F2)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(
+                    color: Color(0xFFB38686),
+                    width: 2.5,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 18,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
             DropdownButtonFormField<KategoriProduk>(
               value: kategori,
-              decoration: const InputDecoration(
+              style: const TextStyle(
+                color: Colors.black,
+                fontFamily: 'Poppins',
+              ),
+              dropdownColor: const Color(0xFFB38686),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: const Color(0xFFF2F2F2),
                 labelText: "Kategori",
-                border: OutlineInputBorder(),
+                labelStyle: const TextStyle(
+                  fontFamily: 'Poppins',
+                  color: Colors.black,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(color: Color(0xFFF2F2F2)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(
+                    color: Color(0xFFB38686),
+                    width: 2.5,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 18,
+                ),
               ),
               items: KategoriProduk.values
-                  .map((e) => DropdownMenuItem(
-                        value: e,
-                        child: Text(e.label),
-                      ))
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e.label)))
                   .toList(),
               onChanged: (v) => setState(() => kategori = v),
             ),
@@ -196,7 +370,8 @@ class _BottomSheetTambahProdukState extends State<BottomSheetTambahProduk> {
                       stokCtrl.text.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                          content: Text("Nama, Harga, dan Stok wajib diisi")),
+                        content: Text("Nama, Harga, dan Stok wajib diisi"),
+                      ),
                     );
                     return;
                   }
@@ -213,7 +388,8 @@ class _BottomSheetTambahProdukState extends State<BottomSheetTambahProduk> {
                           ? null
                           : int.parse(minStokCtrl.text),
                       kategori: kategori!,
-                      imageFile: image, // tetap kirim XFile, service harus handle web juga
+                      imageFile:
+                          image, // tetap kirim XFile, service harus handle web juga
                     );
 
                     widget.onSuccess();

@@ -10,7 +10,8 @@ class DetailProdukScreen extends StatelessWidget {
 
   String formatRupiah(num amount) {
     final str = amount.toInt().toString();
-    return str.replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
+    return str.replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+        (m) => '${m[1]}.');
   }
 
   @override
@@ -21,22 +22,40 @@ class DetailProdukScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // GAMBAR BESAR
           Hero(
             tag: 'produk_${produk.idProduk}',
-            child: Container(
-              height: MediaQuery.of(context).size.height * 0.52,
-              width: double.infinity,
-              child: produk.imageUrl != null
-                  ? Image.network(produk.imageUrl!, fit: BoxFit.cover)
-                  : Container(
-                      color: Colors.brown[100],
-                      child: Icon(Icons.local_cafe_rounded, size: 120, color: Colors.brown[400]),
+            child: Stack(
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.55,
+                  width: double.infinity,
+                  child: produk.imageUrl != null
+                      ? Image.network(produk.imageUrl!, fit: BoxFit.cover)
+                      : Container(
+                          color: Colors.brown[100],
+                          child: Icon(Icons.local_cafe_rounded,
+                              size: 120, color: Colors.brown[400]),
+                        ),
+                ),
+
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.55,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withOpacity(0.15),
+                        Colors.black.withOpacity(0.30),
+                      ],
                     ),
+                  ),
+                ),
+              ],
             ),
           ),
 
-          // Tombol Back
           Positioned(
             top: MediaQuery.of(context).padding.top + 16,
             left: 20,
@@ -44,77 +63,101 @@ class DetailProdukScreen extends StatelessWidget {
               onTap: () => Navigator.pop(context),
               child: Container(
                 padding: const EdgeInsets.all(10),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.85),
                   shape: BoxShape.circle,
-                  boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 10)],
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    )
+                  ],
                 ),
-                child: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+                child:
+                    const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
               ),
             ),
           ),
 
-          // CARD INFO — DIBUAT SCROLLABLE BIAR AMAN SELAMANYA
           Align(
             alignment: Alignment.bottomCenter,
-            child: Container(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 350),
+              curve: Curves.easeOut,
               width: double.infinity,
-              height: MediaQuery.of(context).size.height * 0.56,
+              height: MediaQuery.of(context).size.height * 0.58,
               decoration: const BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(45)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 18,
+                    offset: Offset(0, -4),
+                  )
+                ],
               ),
-              child: SingleChildScrollView(   // ← INI YANG MENYELAMATKAN!
-                padding: const EdgeInsets.fromLTRB(28, 32, 28, 40),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(30, 35, 30, 40),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Nama Produk
                     Text(
                       produk.name,
                       style: GoogleFonts.playfairDisplay(
-                        fontSize: 32,
+                        fontSize: 34,
                         fontWeight: FontWeight.w700,
-                        height: 1.2,
+                        height: 1.25,
                         color: const Color(0xFF2D1B3D),
                       ),
                     ),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 14),
 
-                    // Harga + Status
                     Row(
                       children: [
                         Text(
                           "Rp ${formatRupiah(produk.price)}",
                           style: GoogleFonts.playfairDisplay(
-                            fontSize: 34,
+                            fontSize: 36,
                             fontWeight: FontWeight.bold,
                             color: AppColors.azura,
                           ),
                         ),
                         const Spacer(),
+
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
                           decoration: BoxDecoration(
-                            color: tersedia ? const Color(0xFFE8F5E8) : const Color(0xFFFFEBEE),
+                            color: tersedia
+                                ? const Color(0xFFE8F5E8)
+                                : const Color(0xFFFFEBEE),
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: Row(
-                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
-                                tersedia ? Icons.check_circle : Icons.error,
+                                tersedia
+                                    ? Icons.check_circle
+                                    : Icons.error_outline_rounded,
                                 size: 18,
-                                color: tersedia ? Colors.green.shade700 : Colors.red.shade700,
+                                color: tersedia
+                                    ? Colors.green.shade700
+                                    : Colors.red.shade700,
                               ),
                               const SizedBox(width: 6),
                               Text(
-                                tersedia ? "${produk.stock} tersedia" : "Stok Habis",
+                                tersedia
+                                    ? "${produk.stock} tersedia"
+                                    : "Stok Habis",
                                 style: GoogleFonts.poppins(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
-                                  color: tersedia ? Colors.green.shade800 : Colors.red.shade800,
+                                  color: tersedia
+                                      ? Colors.green.shade800
+                                      : Colors.red.shade800,
                                 ),
                               ),
                             ],
@@ -123,25 +166,27 @@ class DetailProdukScreen extends StatelessWidget {
                       ],
                     ),
 
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 32),
 
-                    // Kategori
                     Row(
                       children: [
-                        Icon(Icons.category_outlined, color: Colors.grey[600], size: 22),
+                        Icon(Icons.category_outlined,
+                            color: Colors.grey[600], size: 22),
                         const SizedBox(width: 12),
                         Text(
                           produk.kategori.label,
-                          style: GoogleFonts.poppins(fontSize: 17, color: Colors.grey[700]),
+                          style: GoogleFonts.poppins(
+                            fontSize: 17,
+                            color: Colors.grey[700],
+                          ),
                         ),
                       ],
                     ),
 
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 32),
 
-                    // Deskripsi
                     Text(
-                      "Deskripsi",
+                      "Deskripsi Produk",
                       style: GoogleFonts.playfairDisplay(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -151,7 +196,7 @@ class DetailProdukScreen extends StatelessWidget {
                     const SizedBox(height: 12),
                     Text(
                       produk.description ??
-                          "Minuman premium dengan rasa yang seimbang, cocok dinikmati kapan saja.",
+                          "Minuman premium dengan rasa yang seimbang, dibuat dari bahan berkualitas, cocok dinikmati kapan saja.",
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         height: 1.7,
@@ -159,30 +204,48 @@ class DetailProdukScreen extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 40), // jaga jarak sebelum tombol
+                    const SizedBox(height: 45),
 
-                    // Tombol Tambah ke Keranjang (selalu di bawah)
                     SizedBox(
                       width: double.infinity,
-                      height: 60,
-                      child: ElevatedButton.icon(
+                      height: 62,
+                      child: ElevatedButton(
                         onPressed: tersedia
                             ? () {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text("${produk.name} ditambahkan!")),
+                                  SnackBar(
+                                      content: Text(
+                                          "${produk.name} ditambahkan!")),
                                 );
                               }
                             : null,
-                        icon: const Icon(Icons.add_shopping_cart_rounded, size: 26),
-                        label: Text(
-                          tersedia ? "Tambah ke Keranjang" : "Stok Habis",
-                          style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w600),
-                        ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: tersedia ? AppColors.azura : Colors.grey[400],
+                          backgroundColor: tersedia
+                              ? AppColors.azura
+                              : Colors.grey[400],
                           foregroundColor: Colors.white,
-                          elevation: 8,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                          elevation: 10,
+                          shadowColor: AppColors.azura.withOpacity(0.3),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(33),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.add_shopping_cart_rounded,
+                                size: 26),
+                            const SizedBox(width: 10),
+                            Text(
+                              tersedia
+                                  ? "Tambah ke Keranjang"
+                                  : "Stok Habis",
+                              style: GoogleFonts.poppins(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),

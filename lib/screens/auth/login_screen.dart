@@ -49,7 +49,6 @@ Widget build(BuildContext context) {
         builder: (context, constraints) {
           return Stack(
             children: [
-              // === LINGKARAN DEKORATIF KIRI ATAS ===
               Positioned(
                 top: -80,
                 left: 60,
@@ -75,7 +74,6 @@ Widget build(BuildContext context) {
                 ),
               ),
 
-              // === LINGKARAN DEKORATIF KANAN BAWAH ===
               Positioned(
                 bottom: -80,
                 right: 60,
@@ -101,7 +99,6 @@ Widget build(BuildContext context) {
                 ),
               ),
 
-              // === KONTEN UTAMA: Scrollable & Full Height ===
               SingleChildScrollView(
                 padding: EdgeInsets.symmetric(
                   horizontal: isLarge ? size.width * 0.15 : 32,
@@ -109,13 +106,12 @@ Widget build(BuildContext context) {
                 ),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight, // Pastikan minimal setinggi layar
+                    minHeight: constraints.maxHeight, 
                   ),
                   child: IntrinsicHeight(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // === HEADER ===
                         Column(
                           children: [
                             const SizedBox(height: 24),
@@ -141,7 +137,6 @@ Widget build(BuildContext context) {
                         ),
                         const SizedBox(height: 48),
 
-                        // === CARD FORM ===
                         Container(
                           padding: EdgeInsets.all(isLarge ? 40 : 32),
                           decoration: BoxDecoration(
@@ -157,7 +152,6 @@ Widget build(BuildContext context) {
                           ),
                           child: Column(
                             children: [
-                              // === TABS: Log In / Sign Up ===
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(30),
                                 child: Container(
@@ -182,7 +176,6 @@ Widget build(BuildContext context) {
                               ),
                               const SizedBox(height: 32),
 
-                              // === INPUT: Username/Email ===
                               _inputField(
                                 controller: _emailController,
                                 label: 'Username/email',
@@ -190,7 +183,6 @@ Widget build(BuildContext context) {
                               ),
                               const SizedBox(height: 16),
 
-                              // === INPUT: Password ===
                               _inputField(
                                 controller: _passwordController,
                                 label: 'Password',
@@ -206,7 +198,6 @@ Widget build(BuildContext context) {
                               ),
                               const SizedBox(height: 32),
 
-                              // === BUTTON: Log In ===
                               SizedBox(
                                 width: double.infinity,
                                 height: 56,
@@ -241,8 +232,6 @@ Widget build(BuildContext context) {
                             ],
                           ),
                         ),
-
-                        // === SPASI AKHIR (biar bisa scroll ke bawah) ===
                         const SizedBox(height: 40),
                       ],
                     ),
@@ -257,7 +246,6 @@ Widget build(BuildContext context) {
   );
 }
 
-  // === WIDGET: Tab Button (Log In / Sign Up) ===
   Widget _tabButton(String text, bool active, {VoidCallback? onTap}) {
   final borderRadius = active
       ? const BorderRadius.only(

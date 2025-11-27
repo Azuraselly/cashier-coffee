@@ -66,7 +66,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           builder: (context, constraints) {
             return Stack(
               children: [
-                // === LINGKARAN DEKORATIF KIRI ATAS ===
                 Positioned(
                   top: -80,
                   left: 60,
@@ -92,7 +91,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
 
-                // === LINGKARAN DEKORATIF KANAN BAWAH ===
                 Positioned(
                   bottom: -80,
                   right: 60,
@@ -118,7 +116,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
 
-                // === KONTEN UTAMA ===
                 SingleChildScrollView(
                   padding: EdgeInsets.symmetric(
                     horizontal: isLarge ? size.width * 0.15 : 32,
@@ -132,7 +129,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         children: [
                           const SizedBox(height: 40),
 
-                          // === HEADER ===
                           Column(
                             children: [
                               Text(
@@ -157,7 +153,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           const SizedBox(height: 48),
 
-                          // === CARD FORM ===
                           Container(
                             padding: EdgeInsets.all(isLarge ? 40 : 32),
                             decoration: BoxDecoration(
@@ -173,7 +168,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             child: Column(
                               children: [
-                                // === TABS: Log In / Sign Up ===
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(30),
                                   child: Container(
@@ -198,7 +192,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                                 const SizedBox(height: 32),
 
-                                // === INPUT: Username/Email ===
                                 _inputField(
                                   controller: _emailController,
                                   label: 'Email',
@@ -212,8 +205,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                                 const SizedBox(height: 16),
 
-
-                                // === INPUT: Password ===
                                 _inputField(
                                   controller: _passwordController,
                                   label: 'Password',
@@ -227,9 +218,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     onPressed: () => setState(() => _obscure = !_obscure),
                                   ),
                                 ),
-                                const SizedBox(height: 16),
 
-                                // === INPUT: Confirm Password ===
                                 _inputField(
                                   controller: _confirmPasswordController,
                                   label: 'Confirm Password',
@@ -245,7 +234,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                                 const SizedBox(height: 32),
 
-                                // === BUTTON: Sign Up ===
                                 SizedBox(
                                   width: double.infinity,
                                   height: 56,
@@ -294,7 +282,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // === WIDGET: Tab Button ===
   Widget _tabButton(String text, bool active, {VoidCallback? onTap}) {
     final borderRadius = active
         ? const BorderRadius.only(
@@ -329,7 +316,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // === WIDGET: Input Field ===
   Widget _inputField({
     required TextEditingController controller,
     required String label,

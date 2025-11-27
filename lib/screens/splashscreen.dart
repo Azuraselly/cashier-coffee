@@ -26,7 +26,6 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
-    // Scale + Rotate untuk gambar kopi
     _scaleController = AnimationController(
       duration: const Duration(milliseconds: 1400),
       vsync: this,
@@ -51,7 +50,6 @@ class _SplashScreenState extends State<SplashScreen>
         }),
     );
 
-    // Fade teks
     _fadeController = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
@@ -60,7 +58,6 @@ class _SplashScreenState extends State<SplashScreen>
       CurvedAnimation(parent: _fadeController, curve: Curves.easeIn),
     );
 
-    // Uap kopi
     _steamController = AnimationController(
       duration: const Duration(milliseconds: 2000),
       vsync: this,
@@ -69,7 +66,6 @@ class _SplashScreenState extends State<SplashScreen>
     _steamAnimation = Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero)
         .animate(CurvedAnimation(parent: _steamController, curve: Curves.easeOut));
 
-    // Mulai animasi
     _startAnimation();
   }
 
@@ -110,18 +106,15 @@ class _SplashScreenState extends State<SplashScreen>
       backgroundColor: AppColors.background,
       body: Stack(
         children: [
-          // === LINGKARAN DEKORATIF ===
           _buildDecorativeCircle(top: -100, left: -100, size: 250, color: AppColors.azura.withOpacity(0.2)),
           _buildDecorativeCircle(top: -50, left: -50, size: 180, color: AppColors.selly.withOpacity(0.4)),
           _buildDecorativeCircle(bottom: -120, right: -120, size: 280, color: AppColors.azura.withOpacity(0.15)),
           _buildDecorativeCircle(bottom: -60, right: -60, size: 200, color: AppColors.selly.withOpacity(0.3)),
 
-          // === KONTEN UTAMA ===
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // === GAMBAR KOPI + ANIMASI ===
                 AnimatedBuilder(
                   animation: Listenable.merge([_scaleController, _rotateController]),
                   builder: (context, child) {
@@ -132,7 +125,6 @@ class _SplashScreenState extends State<SplashScreen>
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
-                            // Gambar kopi
                             Container(
                               width: 200,
                               height: 200,
@@ -162,7 +154,6 @@ class _SplashScreenState extends State<SplashScreen>
 
                 const SizedBox(height: 40),
 
-                // === TEKS ===
                 FadeTransition(
                   opacity: _fadeAnimation,
                   child: Column(
@@ -199,7 +190,6 @@ class _SplashScreenState extends State<SplashScreen>
 
                 const SizedBox(height: 80),
 
-                // Loading halus
                 FadeTransition(
                   opacity: _fadeAnimation,
                   child: const SizedBox(

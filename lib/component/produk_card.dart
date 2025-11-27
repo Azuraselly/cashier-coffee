@@ -19,12 +19,21 @@ class ProdukCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool stokHabis = produk.stock <= (produk.minStock ?? 0);
 
-    return Card(
-      elevation: 0,
-      color: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+    return Container(
+  decoration: BoxDecoration(
+    color: const Color(0XFFF2F2F2),
+    borderRadius: BorderRadius.circular(28),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.25),
+        blurRadius: 4,
+        spreadRadius: 0,
+        offset: const Offset(0, 4),
+      ),
+    ],
+  ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(30),
         onTap: () => Navigator.push(
           context,
           PageRouteBuilder(
@@ -69,8 +78,8 @@ class ProdukCard extends StatelessWidget {
                               produk.name,
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: const Color(0xFF2D2D2D),
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black,
                                 height: 1.3,
                               ),
                               maxLines: 2,
@@ -82,16 +91,15 @@ class ProdukCard extends StatelessWidget {
                             onTap: onEdit,
                             child: Container(
                               padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(20)),
-                              child: const Icon(Icons.edit_outlined, size: 18, color: Color(0xFF666666)),
+                              child: const Icon(Icons.edit, size: 24, color: Colors.black),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 6),
                       Text(
                         "Rp ${formatRupiah(produk.price)}",
-                        style: GoogleFonts.poppins(fontSize: 19, fontWeight: FontWeight.w700, color: const Color(0xFF1A1A1A)),
+                        style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
                       ),
                       if (stokHabis) ...[
                         const SizedBox(height: 10),
@@ -107,7 +115,6 @@ class ProdukCard extends StatelessWidget {
               ],
             ),
 
-            // DELETE BUTTON — persis di gambar
             Positioned(
               top: 12,
               right: 12,
@@ -115,10 +122,7 @@ class ProdukCard extends StatelessWidget {
                 onTap: onDelete,
                 child: Container(
                   padding: const EdgeInsets.all(9),
-                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: [
-                    BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 2)),
-                  ]),
-                  child: const Icon(Icons.delete_outline, size: 24, color: Colors.red),
+                  child: const Icon(Icons.delete, size: 24, color: Colors.red),
                 ),
               ),
             ),

@@ -5,7 +5,7 @@ import 'providers/auth_provider.dart';
 import 'services/supabase_client.dart';
 // import 'screens/auth/login_screen.dart';
 // import 'screens/splashscreen.dart';   
-import 'screens/produk/ProdukManagementScreen.dart';
+import 'screens/laporan/laporan_penjualan_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
           fontFamily: 'Inter',
           scaffoldBackgroundColor: const Color(0xFFFAFAFA),
         ),
-        home: const ProdukManagementScreen(), 
+        home: const LaporanPenjualanScreen(), 
         // debugShowCheckedModeBanner: false,
         // routes: {
         //   '/login': (_) => const LoginScreen(),

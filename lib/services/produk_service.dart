@@ -109,4 +109,6 @@ class ProdukService {
     }
     await supabase.from('produk').delete().eq('id_produk', idProduk);
   }
+
+  Future<void> deleteProduk(int idProduk) async {}
 }
