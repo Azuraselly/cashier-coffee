@@ -1,55 +1,110 @@
-// lib/screens/checkout/components/payment_method_bottomsheet.dart
 import 'package:flutter/material.dart';
+import 'package:kasir/utils/constants.dart';
 
 class PaymentMethodBottomSheet extends StatelessWidget {
-  const PaymentMethodBottomSheet({super.key});
-
   final List<Map<String, dynamic>> methods = const [
     {"title": "Tunai", "icon": Icons.attach_money},
     {"title": "QRIS", "icon": Icons.qr_code_scanner},
     {"title": "Kartu Debit/Kredit", "icon": Icons.credit_card},
-    {"title": "Transfer Bank", "icon": Icons.account_balance},
+
   ];
+
+  const PaymentMethodBottomSheet({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(24),
-      decoration: const BoxDecoration(
-        color: Color(0xFFF5E6D3),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -4),
+          ),
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(width: 80, height: 6, decoration: BoxDecoration(color: Colors.grey[400], borderRadius: BorderRadius.circular(3))),
+         
+          Container(
+            width: 80,
+            height: 6,
+            decoration: BoxDecoration(
+              color: Colors.grey[400],
+              borderRadius: BorderRadius.circular(3),
+            ),
+          ),
           const SizedBox(height: 32),
-          const Text("Pilih Metode Pembayaran", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+
+          // Judul
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              "Payment methods",
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+          ),
           const SizedBox(height: 20),
+
+          // Daftar Metode Pembayaran
           ...methods.map((m) => Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: GestureDetector(
                   onTap: () => Navigator.pop(context, m["title"] as String),
                   child: Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 8)],
+                      color: AppColors.azura, 
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: Row(
                       children: [
-                        Icon(m["icon"] as IconData, size: 32, color: const Color(0xFFBCAAA4)),
-                        const SizedBox(width: 20),
-                        Text(m["title"] as String, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
-                        const Spacer(),
-                        const Icon(Icons.check_circle, color: Colors.grey),
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            m["icon"] as IconData,
+                            size: 24,
+                            color: AppColors.azura,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Text(
+                            m["title"] as String,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.white),
                       ],
                     ),
                   ),
                 ),
               )),
-          const SizedBox(height: 20),
+          const SizedBox(height: 30),
         ],
       ),
     );

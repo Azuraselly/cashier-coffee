@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:kasir/models/produk.dart';
 import 'package:kasir/utils/constants.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SpecialCoffeeCard extends StatelessWidget {
   final ProdukModel produk;
@@ -34,7 +35,7 @@ class SpecialCoffeeCard extends StatelessWidget {
           },
           child: const CircleAvatar(
             radius: 22,
-            backgroundColor: Color(0xFF6B4E3D),
+            backgroundColor: AppColors.azura,
             child: Icon(Icons.add, color: Colors.white, size: 26),
           ),
         );
@@ -42,7 +43,7 @@ class SpecialCoffeeCard extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            color: const Color(0xFF9B7E9A),
+            color: AppColors.azura,
             borderRadius: BorderRadius.circular(30),
           ),
           child: Row(
@@ -63,7 +64,7 @@ class SpecialCoffeeCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 child: Text(
                   "$quantity",
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                  style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),
               GestureDetector(
@@ -115,27 +116,26 @@ class SpecialCoffeeCard extends StatelessWidget {
             ),
           ),
 
-          // TEKS TENGAH
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 20, 16),
+              padding: const EdgeInsets.fromLTRB(16, 35, 20, 30),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     produk.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17, color: Colors.black87),
+                    style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 17, color: Colors.black87),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
                     produk.kategori.label,
-                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                    style: GoogleFonts.poppins(fontSize: 15, color: Colors.grey[600]),
                   ),
                   Text(
                     formattedPrice,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF6B4E3D)),
+                    style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF6B4E3D)),
                   ),
                 ],
               ),
