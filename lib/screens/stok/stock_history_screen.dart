@@ -1,14 +1,14 @@
-// lib/screens/stock_history_screen.dart
+// lib/screens/stock/stock_history_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:kasir/utils/constants.dart';
 
 class StockHistoryScreen extends StatelessWidget {
   final String productName;
   const StockHistoryScreen({super.key, required this.productName});
 
-  // Dummy riwayat stok
-  final List<Map<String, dynamic>> dummyHistory = const [
+  final List<Map<String, dynamic>> history = const [
     {
       "jumlah": -5,
       "alasan": "Penjualan",
@@ -46,113 +46,104 @@ class StockHistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFDFAFF),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFDBB8C8),
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: const CloseButton(color: Colors.white),
-        title: Text(
-          "Riwayat Stok",
-          style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white),
-        ),
+        foregroundColor: const Color(0xFF2D1B1B),
+        leading: const CloseButton(),
+        title: Text("Riwayat Stok", style: GoogleFonts.poppins(fontSize: 21, fontWeight: FontWeight.w700)),
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          // Nama produk
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            color: const Color(0xFFDBB8C8).withOpacity(0.2),
-            child: Text(
-              productName,
-              style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600),
+      body: CustomScrollView(
+        slivers: [
+          // Header Produk
+          SliverToBoxAdapter(
+            child: Container(
+              margin: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+              padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 24),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(colors: [AppColors.azura, AppColors.selly]),
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [BoxShadow(color: AppColors.selly.withOpacity(0.15), blurRadius: 4, offset: const Offset(0, 4))],
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.inventory_2_rounded, color: Colors.white, size: 32),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(productName,
+                        style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white)),
+                  ),
+                ],
+              ),
             ),
           ),
 
-          // List riwayat
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(20),
-              itemCount: dummyHistory.length,
-              itemBuilder: (context, i) {
-                final h = dummyHistory[i];
-                final isKurang = h['jumlah'] < 0;
+          // Daftar Riwayat — PAKAI SLIVERLIST = DIJAMIN TIDAK MERAH!
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                final h = history[index];
+                final isMinus = h['jumlah'] < 0;
 
                 return Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.transparent),
-                    boxShadow: [
-                      BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 12, offset: const Offset(0, 6)),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 26,
-                        backgroundColor: isKurang ? Colors.red.shade50 : Colors.green.shade50,
+                  margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  child: Card(
+                    elevation: 6,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      leading: CircleAvatar(
+                        radius: 28,
+                        backgroundColor: isMinus ? Colors.red.shade50 : Colors.green.shade50,
                         child: Icon(
-                          isKurang ? Icons.remove : Icons.add,
-                          color: isKurang ? Colors.redAccent : Colors.green,
-                          size: 30,
+                          isMinus ? Icons.remove_rounded : Icons.add_rounded,
+                          color: isMinus ? Colors.redAccent : Colors.green,
+                          size: 32,
                         ),
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              h['alasan'],
-                              style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              "Oleh ${h['user']} • ${DateFormat('dd MMM yyyy HH:mm').format(DateTime.parse(h['tanggal']))}",
-                              style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey[600]),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Text("${h['old']} → ", style: GoogleFonts.poppins(fontSize: 15)),
-                                Text(
-                                  "${h['new']}",
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: isKurang ? Colors.redAccent : Colors.green,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                      title: Text(
+                        h['alasan'],
+                        style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w700),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: isKurang ? Colors.red.shade50 : Colors.green.shade50,
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: Text(
-                          isKurang ? "${h['jumlah']}" : "+${h['jumlah']}",
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: isKurang ? Colors.redAccent : Colors.green,
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Oleh ${h['user']}", style: GoogleFonts.poppins(fontSize: 14, color: Colors.brown.shade600)),
+                          const SizedBox(height: 4),
+                          Text(
+                            DateFormat('EEEE, dd MMMM yyyy • HH:mm', 'id_ID').format(DateTime.parse(h['tanggal'])),
+                            style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey.shade600),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
+                      trailing: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            isMinus ? "${h['jumlah']}" : "+${h['jumlah']}",
+                            style: GoogleFonts.poppins(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: isMinus ? Colors.redAccent : Colors.green,
+                            ),
+                          ),
+                          Text(
+                            "→ ${h['new']} stok",
+                            style: GoogleFonts.poppins(fontSize: 10, color: Colors.grey.shade700, fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 );
               },
+              childCount: history.length,
             ),
           ),
+
+          const SliverToBoxAdapter(child: SizedBox(height: 30)),
         ],
       ),
     );
