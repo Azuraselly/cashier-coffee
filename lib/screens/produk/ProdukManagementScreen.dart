@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:kasir/component/Tambahproduk.dart';
-import 'package:kasir/models/produk.dart';
-import 'package:kasir/services/produk_service.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:kasir/component/edit_produk.dart';
 import 'package:kasir/component/produk_card.dart';
 import 'package:kasir/component/sidebar_drawer.dart';
 import 'package:kasir/utils/constants.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+import 'package:kasir/component/Tambahproduk.dart';
+import 'package:kasir/models/produk.dart';
+import 'package:kasir/services/produk_service.dart';
 
 class ProdukManagementScreen extends StatefulWidget {
   const ProdukManagementScreen({super.key});
@@ -21,7 +24,7 @@ class _ProdukManagementScreenState extends State<ProdukManagementScreen> {
   bool isLoading = true;
 
   String searchQuery = '';
-  KategoriProduk? filterKategori; 
+  KategoriProduk? filterKategori;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -29,6 +32,27 @@ class _ProdukManagementScreenState extends State<ProdukManagementScreen> {
   void initState() {
     super.initState();
     loadProduk();
+
+    // === KODE TES KONEKSI KE DATABASE ===
+    _testDatabaseConnection();
+  }
+
+  Future<void> _testDatabaseConnection() async {
+    try {
+      print('🔍 Mencoba mengambil data dari tabel "produk"...');
+      final service = ProdukService();
+      final List<ProdukModel> produkList = await service.getAllProduk();
+      print('✅ Berhasil! Jumlah produk dari database: ${produkList.length}');
+      for (var produk in produkList) {
+        print(
+          '   - ID: ${produk.idProduk}, Nama: ${produk.name}, Kategori: ${produk.kategori.name}',
+        );
+      }
+    } catch (e, stack) {
+      print('❌ Gagal mengambil data dari Supabase:');
+      print('Error: $e');
+      print('Stack: $stack');
+    }
   }
 
   Future<void> loadProduk() async {
@@ -46,7 +70,9 @@ class _ProdukManagementScreenState extends State<ProdukManagementScreen> {
 
     if (searchQuery.isNotEmpty) {
       temp = temp
-          .where((p) => p.name.toLowerCase().contains(searchQuery.toLowerCase()))
+          .where(
+            (p) => p.name.toLowerCase().contains(searchQuery.toLowerCase()),
+          )
           .toList();
     }
 
@@ -57,221 +83,281 @@ class _ProdukManagementScreenState extends State<ProdukManagementScreen> {
     setState(() => filteredProduk = temp);
   }
 
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    int crossCount = 2;
+    if (screenWidth > 600) crossCount = 3;
+    if (screenWidth > 900) crossCount = 4;
+    if (screenWidth > 1200) crossCount = 5;
 
- @override
-Widget build(BuildContext context) {
-  final screenWidth = MediaQuery.of(context).size.width;
-  int crossCount = 2;
-  if (screenWidth > 600) crossCount = 3;
-  if (screenWidth > 900) crossCount = 4;
-  if (screenWidth > 1200) crossCount = 5;
+    return Scaffold(
+      key: _scaffoldKey,
+      drawer: const SidebarDrawer(),
+      backgroundColor: AppColors.background,
 
-  return Scaffold(
-    key: _scaffoldKey,
-    drawer: const SidebarDrawer(),
-    backgroundColor: AppColors.background,
-
-    appBar: PreferredSize(
-      preferredSize: const Size.fromHeight(170),
-      child: Container(
-        decoration: const BoxDecoration(
-          color: AppColors.azura,
-          borderRadius: BorderRadius.only(bottomRight: Radius.circular(80)),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.menu, color: Colors.white, size: 30),
-                      onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-                    ),
-                    Text(
-                      'PRODUCT',
-                      style: GoogleFonts.poppins(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(170),
+        child: Container(
+          decoration: const BoxDecoration(
+            color: AppColors.azura,
+            borderRadius: BorderRadius.only(bottomRight: Radius.circular(80)),
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.menu,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                        onPressed: () =>
+                            _scaffoldKey.currentState?.openDrawer(),
                       ),
-                    ),
-                    const Spacer(),
-                    GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (_) => BottomSheetTambahProduk(
-                            onSuccess: loadProduk,
-                            produkEdit: null,
+                      Text(
+                        'PRODUCT',
+                        style: GoogleFonts.poppins(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (_) => BottomSheetTambahProduk(
+                              onSuccess: loadProduk,
+                              produkEdit: null,
+                            ),
+                          );
+                        },
+                        child: const CircleAvatar(
+                          radius: 22,
+                          backgroundColor: Colors.white,
+                          child: Icon(
+                            Icons.add,
+                            color: AppColors.azura,
+                            size: 32,
                           ),
-                        );
-                      },
-                      child: const CircleAvatar(
-                        radius: 22,
-                        backgroundColor: Colors.white,
-                        child: Icon(Icons.add, color: AppColors.azura, size: 32),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Search Bar
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Container(
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 12,
-                        offset: const Offset(0, 6),
+                        ),
                       ),
                     ],
                   ),
-                  child: TextField(
-                    onChanged: (v) {
-                      searchQuery = v;
-                      _applyFilters();
-                    },
-                    decoration: InputDecoration(
-                      hintText: "Cari produk...",
-                      hintStyle: GoogleFonts.poppins(color: Colors.grey.shade600),
-                      prefixIcon: const Icon(Icons.search, color: AppColors.azura),
-                      prefixIconConstraints: const BoxConstraints(minWidth: 40),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.only(top: 16, bottom: 16, left: 10),
+                ),
+                const SizedBox(height: 20),
+
+                // Search Bar
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Container(
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: TextField(
+                      onChanged: (v) {
+                        searchQuery = v;
+                        _applyFilters();
+                      },
+                      decoration: InputDecoration(
+                        hintText: "Cari produk...",
+                        hintStyle: GoogleFonts.poppins(
+                          color: Colors.grey.shade600,
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: AppColors.azura,
+                        ),
+                        prefixIconConstraints: const BoxConstraints(
+                          minWidth: 40,
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.only(
+                          top: 16,
+                          bottom: 16,
+                          left: 10,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
-            ],
-          ),
-        ),
-      ),
-    ),
-
-    body: Column(
-      children: [
-
-        Container(
-          width: double.infinity,
-          color: AppColors.background,
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-
-                _buildCategoryPill("Semua", isAll: true),
-                const SizedBox(width: 12),
-                ...KategoriProduk.values.map((kategori) => Padding(
-                      padding: const EdgeInsets.only(right: 12),
-                      child: _buildCategoryPill(kategori.label, kategori: kategori),
-                    )),
+                const SizedBox(height: 12),
               ],
             ),
           ),
         ),
+      ),
 
-        // Produk Grid
-        Expanded(
-          child: isLoading
-              ? const Center(child: CircularProgressIndicator(color: AppColors.azura))
-              : RefreshIndicator(
-                  onRefresh: loadProduk,
-                  child: filteredProduk.isEmpty
-                      ? Center(
-                          child: Text(
-                            filterKategori == null && searchQuery.isEmpty
-                                ? "Belum ada produk"
-                                : "Tidak ditemukan produk",
-                            style: GoogleFonts.poppins(fontSize: 16, color: Colors.grey[600]),
-                          ),
-                        )
-                      : GridView.builder(
-                          padding: EdgeInsets.all(screenWidth > 600 ? 24 : 16),
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: crossCount,
-                            childAspectRatio: 0.78,
-                            crossAxisSpacing: screenWidth > 600 ? 24 : 16,
-                            mainAxisSpacing: screenWidth > 600 ? 24 : 16,
-                          ),
-                          itemCount: filteredProduk.length,
-                          itemBuilder: (ctx, i) {
-                            final p = filteredProduk[i];
-                            return ProdukCard(
-                              produk: p,
-                              onEdit: () {},
-                              onDelete: () async {
-                                final confirm = await showDialog<bool>(
-                                      context: context,
-                                      builder: (_) => AlertDialog(
-                                        title: const Text("Hapus Produk"),
-                                        content: Text("Yakin ingin menghapus ${p.name}?"),
-                                        actions: [
-                                          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Batal")),
-                                          TextButton(
-                                            onPressed: () => Navigator.pop(context, true),
-                                            child: const Text("Hapus", style: TextStyle(color: Colors.red)),
-                                          ),
-                                        ],
-                                      ),
-                                    ) ??
-                                    false;
+      body: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            color: AppColors.background,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  _buildCategoryPill("Semua", isAll: true),
+                  const SizedBox(width: 12),
+                  ...KategoriProduk.values.map(
+                    (kategori) => Padding(
+                      padding: const EdgeInsets.only(right: 12),
+                      child: _buildCategoryPill(
+                        kategori.label,
+                        kategori: kategori,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
 
-                                if (confirm) {
-                                  await _service.deleteProduk(p.idProduk);
-                                  loadProduk();
-                                }
-                              },
-                            );
-                          },
-                        ),
-                ),
+          // Produk Grid
+          Expanded(
+            child: isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(color: AppColors.azura),
+                  )
+                : RefreshIndicator(
+                    onRefresh: loadProduk,
+                    child: filteredProduk.isEmpty
+                        ? Center(
+                            child: Text(
+                              filterKategori == null && searchQuery.isEmpty
+                                  ? "Belum ada produk"
+                                  : "Tidak ditemukan produk",
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          )
+                        : GridView.builder(
+                            padding: EdgeInsets.all(
+                              screenWidth > 600 ? 24 : 16,
+                            ),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: crossCount,
+                                  childAspectRatio: 0.78,
+                                  crossAxisSpacing: screenWidth > 600 ? 24 : 16,
+                                  mainAxisSpacing: screenWidth > 600 ? 24 : 16,
+                                ),
+                            itemCount: filteredProduk.length,
+                            // Cari bagian ini di GridView.builder:
+                            itemBuilder: (ctx, i) {
+  final p = filteredProduk[i];
+  return ProdukCard(
+    produk: p,
+    onEdit: () {
+      // ✅ BUKA DIALOG EDIT
+      showDialog(
+        context: context,
+        builder: (ctx) => EditProdukDialog(
+          produk: p,
+          onSuccess: loadProduk,
         ),
-      ],
-  ),
-  );
-}
-
-Widget _buildCategoryPill(String label, {KategoriProduk? kategori, bool isAll = false}) {
-  final bool isSelected = isAll ? filterKategori == null : filterKategori == kategori;
-
-  return GestureDetector(
-    onTap: () {
-      setState(() {
-        filterKategori = isAll ? null : kategori;
-        _applyFilters();
-      });
+      );
     },
-    child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-      decoration: BoxDecoration(
-        color: isSelected ? AppColors.azura : Colors.white,
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: AppColors.azura, width: 1.8),
+    onDelete: () async {
+      final confirm = await showDialog<bool>(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: const Text("Hapus Produk"),
+              content: Text("Yakin ingin menghapus ${p.name}?"),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Batal")),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text("Hapus", style: TextStyle(color: Colors.red)),
+                ),
+              ],
+            ),
+          ) ??
+          false;
+
+      if (confirm) {
+        // Cek apakah produk digunakan di stok_barang (opsional)
+        try {
+          await _service.deleteProduk(p.idProduk);
+          loadProduk();
+        } catch (e) {
+          final msg = e.toString();
+          if (msg.contains('foreign key constraint')) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Produk tidak bisa dihapus karena sudah digunakan dalam transaksi.")),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Error: $msg")),
+            );
+          }
+        }
+      }
+    },
+  );
+},
+                          ),
+                  ),
+          ),
+        ],
       ),
-      child: Text(
-        label,
-        style: GoogleFonts.poppins(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          color: isSelected ? Colors.white : AppColors.azura,
+    );
+  }
+
+  Widget _buildCategoryPill(
+    String label, {
+    KategoriProduk? kategori,
+    bool isAll = false,
+  }) {
+    final bool isSelected = isAll
+        ? filterKategori == null
+        : filterKategori == kategori;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          filterKategori = isAll ? null : kategori;
+          _applyFilters();
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.azura : Colors.white,
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(color: AppColors.azura, width: 1.8),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: isSelected ? Colors.white : AppColors.azura,
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

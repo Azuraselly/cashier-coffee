@@ -44,8 +44,20 @@ class SidebarDrawer extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Admin', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 16)),
-                    Text('sellyyy', style: GoogleFonts.poppins(fontSize: 12, color: Colors.black54)),
+                    Text(
+                      'Admin',
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                    Text(
+                      'sellyyy',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: Colors.black54,
+                      ),
+                    ),
                   ],
                 ),
                 const Spacer(),
@@ -77,10 +89,10 @@ class SidebarDrawer extends StatelessWidget {
               iconColor: Colors.redAccent,
               textColor: Colors.redAccent,
               onTap: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Logged out!'), backgroundColor: Colors.red),
-                );
+               
+                Future.delayed(const Duration(milliseconds: 500), () {
+                  Navigator.pushReplacementNamed(context, '/');
+                });
               },
             ),
           ),
@@ -90,11 +102,21 @@ class SidebarDrawer extends StatelessWidget {
   }
 
   // FUNGSI MENU YANG BISA DIKLIK
-  Widget _menuItem(String title, IconData icon, bool selected, BuildContext context, {Color? iconColor, Color? textColor, VoidCallback? onTap}) {
+  Widget _menuItem(
+    String title,
+    IconData icon,
+    bool selected,
+    BuildContext context, {
+    Color? iconColor,
+    Color? textColor,
+    VoidCallback? onTap,
+  }) {
     return ListTile(
       leading: Icon(
         icon,
-        color: selected ? AppColors.azura : (iconColor ?? AppColors.azura.withOpacity(0.7)),
+        color: selected
+            ? AppColors.azura
+            : (iconColor ?? AppColors.azura.withOpacity(0.7)),
         size: 24,
       ),
       title: Text(
@@ -110,7 +132,8 @@ class SidebarDrawer extends StatelessWidget {
       selectedColor: AppColors.azura,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-      onTap: onTap ??
+      onTap:
+          onTap ??
           () {
             // Tutup drawer dulu
             Navigator.pop(context);

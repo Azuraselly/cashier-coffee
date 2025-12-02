@@ -219,6 +219,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   ),
                                 ),
 
+ const SizedBox(height: 16),
                                 _inputField(
                                   controller: _confirmPasswordController,
                                   label: 'Confirm Password',

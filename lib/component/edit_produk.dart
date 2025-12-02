@@ -1,6 +1,9 @@
-         import 'dart:io';
+// lib/component/edit_produk_dialog.dart
+
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kasir/models/produk.dart';
 import 'package:kasir/services/produk_service.dart';
@@ -10,7 +13,11 @@ class EditProdukDialog extends StatefulWidget {
   final ProdukModel produk;
   final VoidCallback onSuccess;
 
-  const EditProdukDialog({Key? key, required this.produk, required this.onSuccess}) : super(key: key);
+  const EditProdukDialog({
+    Key? key,
+    required this.produk,
+    required this.onSuccess,
+  }) : super(key: key);
 
   @override
   State<EditProdukDialog> createState() => _EditProdukDialogState();
@@ -19,45 +26,92 @@ class EditProdukDialog extends StatefulWidget {
 class _EditProdukDialogState extends State<EditProdukDialog> {
   late TextEditingController namaCtrl;
   late TextEditingController hargaCtrl;
-  XFile? newImage;
+
+  final _formKey = GlobalKey<FormState>();
   final picker = ImagePicker();
   final service = ProdukService();
+
+  XFile? newImage;
   bool isLoading = false;
+
+  // Untuk menampilkan pesan error langsung di bawah field harga
+  String? _hargaError;
 
   @override
   void initState() {
     super.initState();
     namaCtrl = TextEditingController(text: widget.produk.name);
-    hargaCtrl = TextEditingController(text: widget.produk.price.toStringAsFixed(0));
+
+    final price = widget.produk.price;
+    final hargaText = price % 1 == 0
+        ? price.toInt().toString()
+        : price.toStringAsFixed(2).replaceAll(RegExp(r'\.?0*$'), '');
+    hargaCtrl = TextEditingController(text: hargaText);
+
+    // Listener untuk validasi real-time saat user ngetik
+    hargaCtrl.addListener(_validateHargaOnTheFly);
+  }
+
+  void _validateHargaOnTheFly() {
+    final text = hargaCtrl.text.trim();
+    if (text.isEmpty) {
+      setState(() => _hargaError = "Harga wajib diisi");
+    } else {
+      // Coba parse ke double
+      final value = double.tryParse(text.replaceAll(',', ''));
+      if (value == null) {
+        setState(() => _hargaError = "Hanya boleh angka ");
+      } else if (value <= 0) {
+        setState(() => _hargaError = "Harga harus lebih dari 0");
+      } else {
+        setState(() => _hargaError = null); // valid
+      }
+    }
   }
 
   Future<void> pickImage() async {
-    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
     if (picked != null) setState(() => newImage = picked);
   }
 
   Future<void> save() async {
-    if (namaCtrl.text.isEmpty || hargaCtrl.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Nama dan harga wajib diisi")));
+    // Validasi nama
+    if (namaCtrl.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Nama produk wajib diisi"), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    // Validasi harga (cek dari listener)
+    if (_hargaError != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_hargaError!), backgroundColor: Colors.red),
+      );
       return;
     }
 
     setState(() => isLoading = true);
+
     try {
+      final double harga = double.parse(hargaCtrl.text.replaceAll(',', ''));
+
       await service.updateProdukSimple(
         idProduk: widget.produk.idProduk,
         name: namaCtrl.text.trim(),
-        price: double.parse(hargaCtrl.text),
+        price: harga,
         newImage: newImage,
         oldImageUrl: widget.produk.imageUrl,
       );
 
       widget.onSuccess();
-      if (mounted) Navigator.pop(context);
+      if (mounted) Navigator.of(context).pop();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Gagal update: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Gagal update: $e"), backgroundColor: Colors.red),
+      );
     } finally {
-      setState(() => isLoading = false);
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
@@ -67,68 +121,118 @@ class _EditProdukDialogState extends State<EditProdukDialog> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text("Edit Product", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("Edit Produk", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 20),
 
-            const Align(alignment: Alignment.centerLeft, child: Text("Name Product")),
-            const SizedBox(height: 8),
-            TextField(
-              controller: namaCtrl,
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.grey[100],
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            const Align(alignment: Alignment.centerLeft, child: Text("Price")),
-            const SizedBox(height: 8),
-            TextField(
-              controller: hargaCtrl,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                prefixText: "Rp. ",
-                filled: true,
-                fillColor: Colors.grey[100],
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: isLoading ? null : save,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.azura,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: isLoading
-                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                        : const Text("Save", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              // GAMBAR
+              GestureDetector(
+                onTap: pickImage,
+                child: Container(
+                  width: 110,
+                  height: 110,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300, width: 2),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: newImage != null
+                        ? (kIsWeb
+                            ? Image.network(newImage!.path, fit: BoxFit.cover)
+                            : Image.file(File(newImage!.path), fit: BoxFit.cover))
+                        : widget.produk.imageUrl != null && widget.produk.imageUrl!.isNotEmpty
+                            ? Image.network(widget.produk.imageUrl!, fit: BoxFit.cover)
+                            : const Icon(Icons.add_a_photo_outlined, size: 40, color: Colors.grey),
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: AppColors.azura),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: Text("Cancel", style: TextStyle(color: AppColors.azura)),
-                  ),
+              ),
+              const SizedBox(height: 8),
+              TextButton.icon(
+                onPressed: pickImage,
+                icon: const Icon(Icons.photo_library, size: 18),
+                label: const Text("Ganti Gambar"),
+              ),
+              const SizedBox(height: 20),
+
+              // NAMA
+              const Align(alignment: Alignment.centerLeft, child: Text("Nama Produk")),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: namaCtrl,
+                textCapitalization: TextCapitalization.words,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                  hintText: "Masukkan nama produk",
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AppColors.azura, width: 2)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(height: 16),
+
+              // HARGA + NOTIFIKASI LANGSUNG
+              const Align(alignment: Alignment.centerLeft, child: Text("Harga")),
+              const SizedBox(height: 8),
+              TextField(
+                controller: hargaCtrl,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                // Huruf boleh diketik → tapi langsung kasih notif error
+                decoration: InputDecoration(
+                  prefixText: "Rp ",
+                  filled: true,
+                  fillColor: Colors.grey[100],
+             
+                  hintStyle: TextStyle(color: Colors.grey[500]),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AppColors.azura, width: 2)),
+                  errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.red)),
+                  errorText: _hargaError, // ← INI YANG MUNCUL LANGSUNG KALAU SALAH
+                  errorStyle: const TextStyle(color: Colors.red, fontSize: 12),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                ),
+              ),
+              const SizedBox(height: 28),
+
+              // TOMBOL
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: isLoading ? null : () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: AppColors.azura),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: Text("Batal", style: TextStyle(color: AppColors.azura)),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: isLoading ? null : save,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.azura,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: isLoading
+                          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                          : const Text("Simpan", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -136,6 +240,7 @@ class _EditProdukDialogState extends State<EditProdukDialog> {
 
   @override
   void dispose() {
+    hargaCtrl.removeListener(_validateHargaOnTheFly);
     namaCtrl.dispose();
     hargaCtrl.dispose();
     super.dispose();

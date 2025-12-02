@@ -1,4 +1,5 @@
 // lib/services/produk_service.dart
+
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,7 +9,6 @@ import 'package:kasir/models/produk.dart';
 class ProdukService {
   final supabase = Supabase.instance.client;
 
-  // ====================== GET ALL ======================
   Future<List<ProdukModel>> getAllProduk() async {
     final response = await supabase
         .from('produk')
@@ -20,7 +20,6 @@ class ProdukService {
         .toList();
   }
 
-  // ====================== TAMBAH PRODUK ======================
   Future<void> tambahProduk({
     required String name,
     String? description,
@@ -54,52 +53,50 @@ class ProdukService {
       'stock': stock,
       'min_stock': minStock,
       'image_url': imageUrl,
-      'kategori': kategori.toString().split('.').last, // <-- FIX DI SINI
+      'kategori': kategori.toString().split('.').last,
     });
   }
 
-  // ====================== UPDATE SIMPLE (hanya nama, harga, gambar) ======================
-  Future<void> updateProdukSimple({
-    required int idProduk,
-    required String name,
-    required double price,
-    XFile? newImage,
-    String? oldImageUrl,
-  }) async {
-    String? imageUrl = oldImageUrl;
+  // Bagian updateProdukSimple (sudah benar, pastikan tidak berubah)
 
-    // Hapus gambar lama kalau ada gambar baru
-    if (newImage != null && oldImageUrl != null) {
-      final oldFileName = oldImageUrl.split('/').last;
-      try {
-        await supabase.storage.from('produk_images').remove([oldFileName]);
-      } catch (_) {}
-    }
+Future<void> updateProdukSimple({
+  required int idProduk,
+  required String name,
+  required double price,
+  XFile? newImage,
+  String? oldImageUrl,
+}) async {
+  String? imageUrl = oldImageUrl;
 
-    // Upload gambar baru
-    if (newImage != null) {
-      final ext = newImage.path.split('.').last;
-      final fileName = '${DateTime.now().millisecondsSinceEpoch}.$ext';
-
-      if (kIsWeb) {
-        final bytes = await newImage.readAsBytes();
-        await supabase.storage.from('produk_images').uploadBinary(fileName, bytes);
-      } else {
-        await supabase.storage.from('produk_images').upload(fileName, File(newImage.path));
-      }
-
-      imageUrl = supabase.storage.from('produk_images').getPublicUrl(fileName);
-    }
-
-    await supabase.from('produk').update({
-      'name': name,
-      'price': price,
-      if (imageUrl != null) 'image_url': imageUrl,
-      'updated_at': DateTime.now().toIso8601String(),
-    }).eq('id_produk', idProduk);
+  if (newImage != null && oldImageUrl != null) {
+    final oldFileName = oldImageUrl.split('/').last;
+    try {
+      await supabase.storage.from('produk_images').remove([oldFileName]);
+    } catch (_) {}
   }
 
-  // ====================== HAPUS PRODUK ======================
+  if (newImage != null) {
+    final ext = newImage.path.split('.').last;
+    final fileName = '${DateTime.now().millisecondsSinceEpoch}.$ext';
+
+    if (kIsWeb) {
+      final bytes = await newImage.readAsBytes();
+      await supabase.storage.from('produk_images').uploadBinary(fileName, bytes);
+    } else {
+      await supabase.storage.from('produk_images').upload(fileName, File(newImage.path));
+    }
+
+    imageUrl = supabase.storage.from('produk_images').getPublicUrl(fileName);
+  }
+
+  await supabase.from('produk').update({
+    'name': name,
+    'price': price,
+    if (imageUrl != null) 'image_url': imageUrl,
+    'updated_at': DateTime.now().toIso8601String(),
+  }).eq('id_produk', idProduk);
+}
+
   Future<void> hapusProduk(int idProduk, String? imageUrl) async {
     if (imageUrl != null) {
       final fileName = imageUrl.split('/').last;
@@ -110,5 +107,17 @@ class ProdukService {
     await supabase.from('produk').delete().eq('id_produk', idProduk);
   }
 
-  Future<void> deleteProduk(int idProduk) async {}
+  // ✅ PERBAIKI INI: ambil imageUrl dulu, lalu hapus
+  Future<void> deleteProduk(int idProduk) async {
+    final response = await supabase
+        .from('produk')
+        .select('image_url')
+        .eq('id_produk', idProduk)
+        .single();
+
+    final imageUrl = response?['image_url'] as String?;
+    await hapusProduk(idProduk, imageUrl);
+  }
+
+  Future<void> updateProduk({required id, required String name, String? description, required double price, required int stock, int? minStock, required KategoriProduk kategori, XFile? imageFile}) async {}
 }
