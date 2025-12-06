@@ -1,5 +1,3 @@
-// lib/services/produk_service.dart
-
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
@@ -57,7 +55,6 @@ class ProdukService {
     });
   }
 
-  // Bagian updateProdukSimple (sudah benar, pastikan tidak berubah)
 
 Future<void> updateProdukSimple({
   required int idProduk,
@@ -120,4 +117,39 @@ Future<void> updateProdukSimple({
   }
 
   Future<void> updateProduk({required id, required String name, String? description, required double price, required int stock, int? minStock, required KategoriProduk kategori, XFile? imageFile}) async {}
+
+  Future<void> updateStokWithHistory({required int idProduk, required int newStock, required String reason}) async {}
+}
+
+
+Future<void> updateStokWithHistory({
+  required int idProduk,
+  required int newStock,
+  required String reason,
+  String? userId, 
+}) async {
+  final supabase = Supabase.instance.client;
+
+  final oldResponse = await supabase
+      .from('produk')
+      .select('stock')
+      .eq('id_produk', idProduk)
+      .single();
+
+  final int oldStock = oldResponse['stock'] as int;
+  final int changeAmount = newStock - oldStock;
+
+  await supabase
+      .from('produk')
+      .update({'stock': newStock, 'updated_at': DateTime.now().toIso8601String()})
+      .eq('id_produk', idProduk);
+
+  await supabase.from('stock_history').insert({
+    'id_product': idProduk,
+    'change_amount': changeAmount,
+    'reason': reason,
+    'user_id': userId,
+    'old_stock': oldStock,
+    'new_stock': newStock,
+  });
 }
