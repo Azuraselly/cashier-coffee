@@ -49,12 +49,12 @@ class MyApp extends StatelessWidget {
             foregroundColor: Color(0xFF2D1B1B),
           ),
         ),
-        // home: CashierScreen(), 
-         home: SplashScreen(),
-        routes: {
-          '/login': (_) => const LoginScreen(),
-          '/dashboard': (_) => const DashboardScreen(),
-        },
+        home: CashierScreen(), 
+        //  home: SplashScreen(),
+        // routes: {
+        //   '/login': (_) => const LoginScreen(),
+        //   '/dashboard': (_) => const DashboardScreen(),
+        // },
       ),
     );
   }

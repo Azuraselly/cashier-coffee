@@ -1,16 +1,18 @@
-
 import 'package:flutter/material.dart';
 import 'package:kasir/models/produk.dart';
 import 'package:kasir/utils/constants.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class KategoriTab extends StatelessWidget {
   final KategoriProduk kategori;
+  final String? labelOverride; 
   final bool isActive;
   final VoidCallback onTap;
 
   const KategoriTab({
     super.key,
     required this.kategori,
+    this.labelOverride,
     required this.isActive,
     required this.onTap,
   });
@@ -28,34 +30,14 @@ class KategoriTab extends StatelessWidget {
           color: isActive ? Colors.white : Colors.white.withOpacity(0.15),
           borderRadius: BorderRadius.circular(30),
           border: isActive ? Border.all(color: Colors.white, width: 2) : null,
-          
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            isActive
-                ? ShaderMask(
-                    shaderCallback: (bounds) => const LinearGradient(
-                      colors: [AppColors.azura, AppColors.azura],
-                    ).createShader(bounds),
-                    child: Text(
-                      kategori.label,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white, 
-                      ),
-                    ),
-                  )
-                : Text(
-                    kategori.label,
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: isActive ? FontWeight.bold : FontWeight.w600,
-                      color: isActive ? AppColors.azura : Colors.white,
-                    ),
-                  ),
-          ],
+        child: Text(
+          labelOverride ?? kategori.label,
+          style: GoogleFonts.poppins(
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+            color: isActive ? AppColors.azura : Colors.white,
+          ),
         ),
       ),
     );

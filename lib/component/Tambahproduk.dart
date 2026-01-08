@@ -301,7 +301,7 @@ class _BottomSheetTambahProdukState extends State<BottomSheetTambahProduk> {
               decoration: InputDecoration(
                 filled: true,
                 fillColor: const Color(0xFFF2F2F2),
-                labelText: "Nama Produk *",
+                labelText: "Nama Produk ",
                 errorText: errorNama,
                 errorStyle: const TextStyle(color: Colors.red, fontSize: 12),
                 labelStyle: const TextStyle(fontFamily: 'Poppins'),
@@ -365,7 +365,7 @@ class _BottomSheetTambahProdukState extends State<BottomSheetTambahProduk> {
               decoration: InputDecoration(
                 filled: true,
                 fillColor: const Color(0xFFF2F2F2),
-                labelText: "Harga *",
+                labelText: "Harga ",
                 errorText: errorHarga,
                 errorStyle: const TextStyle(color: Colors.red, fontSize: 12),
                 labelStyle: const TextStyle(fontFamily: 'Poppins'),
@@ -404,7 +404,7 @@ class _BottomSheetTambahProdukState extends State<BottomSheetTambahProduk> {
               decoration: InputDecoration(
                 filled: true,
                 fillColor: const Color(0xFFF2F2F2),
-                labelText: "Stok *",
+                labelText: "Stok ",
                 errorText: errorStok,
                 errorStyle: const TextStyle(color: Colors.red, fontSize: 12),
                 labelStyle: const TextStyle(fontFamily: 'Poppins'),

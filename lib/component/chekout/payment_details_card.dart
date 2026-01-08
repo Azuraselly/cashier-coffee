@@ -42,7 +42,7 @@ class PaymentDetailsCard extends StatelessWidget {
               color: Colors.black,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 10),
 
           // Subtotal
           _buildDetailRow(
@@ -63,14 +63,13 @@ class PaymentDetailsCard extends StatelessWidget {
             ),
 
           // Garis pemisah
-          const SizedBox(height: 12),
+          const SizedBox(height: 1),
           Container(
             height: 1,
             color: Colors.grey.shade200,
           ),
           const SizedBox(height: 12),
 
-          // Total Payment — highlight!
           _buildDetailRow(
             label: "Total Payment",
             value: "Rp. ${formatRupiah(total)}",
@@ -110,21 +109,21 @@ class PaymentDetailsCard extends StatelessWidget {
               color: iconColor,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
           Text(
             label,
             style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: boldLabel ? FontWeight.w600 : FontWeight.w500,
-              color: isTotal ? AppColors.azura : Colors.black,
+              fontSize: 15,
+              fontWeight: boldLabel ? FontWeight.w500 : FontWeight.w500,
+              color: isTotal ? Colors.black : Colors.black,
             ),
           ),
           const Spacer(),
           Text(
             value,
             style: GoogleFonts.poppins(
-              fontSize: isTotal ? 19 : 17,
-              fontWeight: FontWeight.bold,
+              fontSize: isTotal ? 15 : 15,
+              fontWeight: FontWeight.w600,
               color: isTotal
                   ? AppColors.azura
                   : isNegative

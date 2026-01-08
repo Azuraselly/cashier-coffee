@@ -1,8 +1,11 @@
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kasir/models/cart_item.dart';
 import 'package:kasir/utils/constants.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+import 'package:intl/intl.dart'; 
 
 class ReceiptDialog extends StatelessWidget {
   final String customerName, paymentMethod, note;
@@ -21,7 +24,7 @@ class ReceiptDialog extends StatelessWidget {
     required this.paymentMethod,
     required this.note,
     this.cashAmount,
-    this.changeAmount, String? password,
+    this.changeAmount,
   });
 
   String formatRupiah(int amount) {
@@ -33,182 +36,214 @@ class ReceiptDialog extends StatelessWidget {
     )}';
   }
 
+  String get currentDateTime => DateFormat('dd MMMM yyyy, HH:mm').format(DateTime.now());
+
+  Future<void> _generateAndPrintPdf(BuildContext context) async {
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(40),
+        build: (pw.Context context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Center(
+                child: pw.Text(
+                  AppText.appName,
+                  style: pw.TextStyle(fontSize: 15, fontWeight: pw.FontWeight.bold),
+                ),
+              ),
+              pw.SizedBox(height: 10),
+              pw.Center(child: pw.Text(currentDateTime, style: const pw.TextStyle(fontSize: 15 ))),
+              pw.SizedBox(height: 10),
+
+              pw.Text("Pelanggan: $customerName"),
+              pw.Text("Metode: $paymentMethod"),
+              if (note.isNotEmpty) pw.Text("Catatan: $note"),
+              pw.SizedBox(height: 10),
+              pw.Divider(),
+
+              pw.Text("Pesanan:", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 15 )),
+              pw.SizedBox(height: 10),
+              ...items.map((item) => pw.Padding(
+                    padding: const pw.EdgeInsets.symmetric(vertical: 6),
+                    child: pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Expanded(child: pw.Text("${item.produk.name} × ${item.qty}")),
+                        pw.Text(formatRupiah(item.produk.price * item.qty)),
+                      ],
+                    ),
+                  )),
+
+              pw.Divider(height: 15),
+              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
+                pw.Text("Subtotal"),
+                pw.Text(formatRupiah(subtotal)),
+              ]),
+              if (discount > 0)
+                pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
+                  pw.Text("Diskon"),
+                  pw.Text("-${formatRupiah(discount)}", style: const pw.TextStyle(color: PdfColors.green)),
+                ]),
+              pw.SizedBox(height: 8),
+              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
+                pw.Text("Total Bayar", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 15 )),
+                pw.Text(formatRupiah(total), style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 15 )),
+              ]),
+
+              if (cashAmount != null) ...[
+                pw.SizedBox(height: 10),
+                pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
+                  pw.Text("Tunai"),
+                  pw.Text(formatRupiah(cashAmount!)),
+                ]),
+                pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
+                  pw.Text("Kembalian"),
+                  pw.Text(formatRupiah(changeAmount ?? 0), style: const pw.TextStyle(color: PdfColors.green)),
+                ]),
+              ],
+
+              pw.SizedBox(height: 30),
+              pw.Center(child: pw.Text("Terima kasih atas kunjungan Anda ☕", style: const pw.TextStyle(fontSize: 15 ))),
+              pw.Center(child: pw.Text("Selamat menikmati!", style: const pw.TextStyle(fontSize: 15 ))),
+            ],
+          );
+        },
+      ),
+    );
+
+    await Printing.layoutPdf(
+      onLayout: (format) async => pdf.save(),
+      name: 'Struk_${AppText.appName.replaceAll(' ', '_')}_${DateTime.now().millisecondsSinceEpoch}.pdf',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
       backgroundColor: Colors.transparent,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20),
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(28),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
+          gradient: LinearGradient(
+            colors: [Colors.white, Colors.grey.shade50],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          borderRadius: BorderRadius.circular(32),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 30,
+              offset: const Offset(0, 10),
             ),
           ],
         ),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Brand header
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: AppColors.card,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  AppText.appName,
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.azura,
-                  ),
-                ),
+              // Header Success
+              Icon(
+                Icons.check_circle_rounded,
+                color: AppColors.azura,
+                size: 80,
               ),
-              const SizedBox(height: 20),
-
-              // Icon & success message
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.card.withOpacity(0.8),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.receipt_long_rounded,
-                  size: 52,
-                  color: AppColors.azura,
-                ),
-              ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 10),
               Text(
                 "Pembayaran Berhasil!",
                 style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  fontSize: 18 ,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.azura,
                 ),
-                textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
               Text(
-                "Terima kasih sudah menikmati secangkir kebahagiaan ☕",
-                style: GoogleFonts.poppins(
-                  fontSize: 13,
-                  color: AppColors.textSecondary,
-                ),
-                textAlign: TextAlign.center,
+                currentDateTime,
+                style: GoogleFonts.poppins(fontSize: 15 , color: Colors.grey[600]),
               ),
-              const SizedBox(height: 24),
-
-              // Customer & payment info
-              _buildInfoRow("Pelanggan", customerName),
-              _buildInfoRow("Metode", paymentMethod),
-              if (note.isNotEmpty) _buildInfoRow("Catatan", note),
-
               const SizedBox(height: 20),
-              const Divider(height: 1, thickness: 1, color: AppColors.border),
 
-              // Items list
-              const SizedBox(height: 12),
-              Text(
-                "Pesanan Anda",
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+              // Info Ringkas
+              _buildModernRow("Pelanggan", customerName.isEmpty ? "Umum" : customerName),
+              _buildModernRow("Metode", paymentMethod),
+              if (note.isNotEmpty) _buildModernRow("Catatan", note),
+
+              const SizedBox(height: 15),
+              Divider(color: Colors.grey.shade300, thickness: 1),
+
+              // Daftar Pesanan
+              const SizedBox(height: 10),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Pesanan Anda",
+                  style: GoogleFonts.poppins(fontSize: 15 , fontWeight: FontWeight.w600),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               ...items.map((item) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
                           child: Text(
                             item.produk.name,
-                            style: GoogleFonts.poppins(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textPrimary,
-                            ),
+                            style: GoogleFonts.poppins(fontSize: 15 , fontWeight: FontWeight.w500),
                           ),
                         ),
-                        const SizedBox(width: 8),
                         Text(
                           "×${item.qty}",
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            color: AppColors.textSecondary,
-                          ),
+                          style: GoogleFonts.poppins(fontSize: 15 , color: Colors.grey[600]),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 10),
                         Text(
                           formatRupiah(item.produk.price * item.qty),
-                          style: GoogleFonts.poppins(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
-                          ),
+                          style: GoogleFonts.poppins(fontSize: 15 , fontWeight: FontWeight.w600),
                         ),
                       ],
                     ),
                   )),
 
-              const Divider(height: 20, thickness: 1, color: AppColors.border),
+              Divider(color: Colors.grey.shade300, thickness: 1),
+              const SizedBox(height: 10),
 
-              // Summary
-              _buildSummaryRow("Subtotal", subtotal),
-              if (discount > 0) _buildSummaryRow("Diskon", discount, isNegative: true),
-              _buildSummaryRow("Total", total, isTotal: true),
+              // Ringkasan Harga
+              _buildPriceRow("Subtotal", subtotal),
+              if (discount > 0)
+                _buildPriceRow("Diskon", discount, isDiscount: true),
+              const SizedBox(height: 10),
+              _buildPriceRow("Total Bayar", total, isTotal: true),
 
-              // Cash & change (if applicable)
               if (cashAmount != null) ...[
-                _buildSummaryRow("Tunai", cashAmount!),
-                _buildSummaryRow("Kembalian", changeAmount ?? 0),
+                const SizedBox(height: 10),
+                _buildPriceRow("Tunai Diterima", cashAmount!),
+                _buildPriceRow("Kembalian", changeAmount ?? 0, isChange: true),
               ],
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 30),
 
-              // Action buttons
+              // Tombol Aksi
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed: () {
-                    // TODO: Cetak struk (printer/PDF)
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          '🖨️ Mencetak struk untuk ${AppText.appName}...',
-                          style: GoogleFonts.poppins(),
-                        ),
-                        backgroundColor: AppColors.azura,
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.print, size: 18),
+                  onPressed: () => _generateAndPrintPdf(context),
+                  icon: const Icon(Icons.print_rounded, size: 20),
                   label: Text(
                     "Cetak Struk",
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.azura,
-                    ),
+                    style: GoogleFonts.poppins(fontSize: 15 , fontWeight: FontWeight.w600),
                   ),
                   style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: AppColors.azura),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    foregroundColor: AppColors.azura,
+                    side: BorderSide(color: AppColors.azura, width: 2),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                 ),
               ),
@@ -219,20 +254,21 @@ class ReceiptDialog extends StatelessWidget {
                   onPressed: () => Navigator.of(context).pop(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.azura,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
                     padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    elevation: 8,
                   ),
                   child: Text(
                     "Selesai",
-                    style: GoogleFonts.poppins(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: GoogleFonts.poppins(fontSize: 15 , fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                 ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "Terima kasih atas kunjungan Anda ☕",
+                style: GoogleFonts.poppins(fontSize: 15 , color: Colors.grey[600]),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
@@ -241,29 +277,21 @@ class ReceiptDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildModernRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            "$label:",
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textSecondary,
-            ),
+            label,
+            style: GoogleFonts.poppins(fontSize: 15 , color: Colors.grey[700]),
           ),
-          const SizedBox(width: 8),
           Flexible(
             child: Text(
               value,
-              style: GoogleFonts.poppins(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
+              style: GoogleFonts.poppins(fontSize: 15 , fontWeight: FontWeight.w600),
+              textAlign: TextAlign.end,
             ),
           ),
         ],
@@ -271,26 +299,32 @@ class ReceiptDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryRow(String label, int amount, {bool isNegative = false, bool isTotal = false}) {
+  Widget _buildPriceRow(String label, int amount, {bool isDiscount = false, bool isTotal = false, bool isChange = false}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
             style: GoogleFonts.poppins(
-              fontSize: isTotal ? 16 : 15,
-              fontWeight: isTotal ? FontWeight.w700 : FontWeight.w500,
-              color: isTotal ? AppColors.textPrimary : AppColors.textSecondary,
+              fontSize: isTotal ? 15 : 15,
+              fontWeight: isTotal ? FontWeight.bold : FontWeight.w600,
+              color: isTotal ? AppColors.azura : Colors.grey[800],
             ),
           ),
           Text(
-            isNegative ? "-${formatRupiah(amount)}" : formatRupiah(amount),
+            isDiscount ? "-${formatRupiah(amount)}" : formatRupiah(amount),
             style: GoogleFonts.poppins(
-              fontSize: isTotal ? 18 : 15,
-              fontWeight: isTotal ? FontWeight.w700 : FontWeight.w600,
-              color: isTotal ? AppColors.azura : AppColors.textPrimary,
+              fontSize:  isTotal ? 15 : 15,
+              fontWeight: isTotal ? FontWeight.bold : FontWeight.w600,
+              color: isDiscount
+                  ? Colors.green[700]
+                  : isChange
+                      ? Colors.green[700]
+                      : isTotal
+                          ? AppColors.azura
+                          : Colors.black,
             ),
           ),
         ],

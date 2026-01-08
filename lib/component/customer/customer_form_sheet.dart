@@ -139,7 +139,7 @@ class _CustomerFormSheetState extends State<CustomerFormSheet> {
 
               _buildField(
                 controller: _nameCtrl,
-                label: 'Nama Lengkap *',
+                label: 'Nama Lengkap ',
                 icon: Icons.person_outline_rounded,
                 validator: (value) {
                   final v = (value ?? '').trim();
@@ -156,7 +156,7 @@ class _CustomerFormSheetState extends State<CustomerFormSheet> {
 
               _buildField(
   controller: _phoneCtrl,
-  label: 'Nomor Telepon *',
+  label: 'Nomor Telepon ',
   icon: Icons.phone_android_rounded,
   keyboardType: TextInputType.phone, // tetap pakai phone untuk keyboard
   // ❌ HAPUS FilteringTextInputFormatter.digitsOnly

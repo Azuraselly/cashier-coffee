@@ -1,4 +1,3 @@
-// component/cashier/coffee_card.dart  →  GANTI NAMA JADI SpecialCoffeeCard
 import 'package:flutter/material.dart';
 import 'package:kasir/models/produk.dart';
 import 'package:kasir/utils/constants.dart';
@@ -64,7 +63,11 @@ class SpecialCoffeeCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 child: Text(
                   "$quantity",
-                  style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
               ),
               GestureDetector(
@@ -96,53 +99,85 @@ class SpecialCoffeeCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // GAMBAR KIRI
+          // GAMBAR KIRI - DIPERBAIKI LENGKAP
           ClipRRect(
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(24),
               bottomLeft: Radius.circular(24),
             ),
+            child: Hero(
+                      tag: 'produk_${produk.idProduk}',
             child: Image.network(
-              produk.imageUrl ?? "asstes/images/Matcha.png",
+              produk.imageUrl ?? "",
               width: 140,
               height: 140,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
-                width: 140,
-                height: 140,
-                color: Colors.grey[300],
-                child: const Icon(Icons.coffee, size: 50, color: Colors.grey),
-              ),
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Container(
+                  width: 140,
+                  height: 140,
+                  color: Colors.grey[300],
+                  child: const Center(
+                    child: CircularProgressIndicator(color: AppColors.azura),
+                  ),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  width: 140,
+                  height: 140,
+                  color: Colors.grey[300],
+                  child: const Icon(
+                    Icons.coffee,
+                    size: 50,
+                    color: Colors.grey,
+                  ),
+                );
+              },
             ),
+            )
           ),
 
+          // DETAIL TENGAH
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 35, 20, 30),
+              padding: const EdgeInsets.fromLTRB(16, 20, 20, 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text(
                     produk.name,
-                    style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 17, color: Colors.black87),
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
+                      color: Colors.black87,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
                     produk.kategori.label,
-                    style: GoogleFonts.poppins(fontSize: 15, color: Colors.grey[600]),
+                    style: GoogleFonts.poppins(
+                      fontSize: 15,
+                      color: Colors.grey[600],
+                    ),
                   ),
                   Text(
                     formattedPrice,
-                    style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF6B4E3D)),
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: const Color(0xFF6B4E3D),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
 
-          // TOMBOL + / − 1 + DI KANAN
+          // TOMBOL + / - DI KANAN
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: buildAddButton(),

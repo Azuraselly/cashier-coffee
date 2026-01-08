@@ -6,133 +6,182 @@ import 'package:kasir/utils/constants.dart';
 class OrderItemCard extends StatelessWidget {
   final CartItem item;
   final String Function(int) formatRupiah;
+  final VoidCallback onRemove;
+  final Function(int) onUpdateQty;
+
   const OrderItemCard({
     super.key,
     required this.item,
     required this.formatRupiah,
+    required this.onRemove,
+    required this.onUpdateQty,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 500,
-      height: 160,
-      margin: const EdgeInsets.only(bottom: 12), // Jarak antar card
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(20),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.25),
-            blurRadius: 4,
-            offset: Offset(0, 4),
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+            spreadRadius: 0,
           ),
         ],
       ),
-      child: Row(
-        children: [
-          // Gambar Produk
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.network(
-              item.produk.imageUrl ?? "https://via.placeholder.com/300",
-              width: 160,
-              height: 160,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
-                color: Colors.grey[300],
-                child: const Icon(Icons.coffee, size: 32),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Gambar Produk
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Image.network(
+                item.produk.imageUrl ?? "https://via.placeholder.com/300",
+                width: 110,
+                height: 110,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    color: Colors.grey[200],
+                    child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                  );
+                },
+                errorBuilder: (_, __, ___) => Container(
+                  color: Colors.grey[200],
+                  child: Icon(Icons.local_cafe, size: 40, color: Colors.brown[300]),
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 16),
+            const SizedBox(width: 16),
 
-          // Nama & Harga
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  item.produk.name,
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  "Ice Drink", 
-                  style: GoogleFonts.poppins(
-                    fontSize: 15,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  "Rp. ${formatRupiah(item.produk.price)}",
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                    color: Colors.black,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          Container(
-            width: 90, 
-            height: 50,
-            decoration: BoxDecoration(
-              color: AppColors.azura,
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: Stack(
-              children: [
-                Positioned(
-                  left: 0,
-                  top: 0,
-                  bottom: 0,
-                  child: Container(
-                    width: 50,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
+            // Detail Produk
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    item.produk.name,
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black87,
                     ),
-                    child: const Center(
-                      child: Text(
-                        "−",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                          fontSize: 20,
-                        ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.azura.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      item.produk.kategori.toString().split('.').last.toUpperCase(),
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.azura,
                       ),
                     ),
                   ),
-                ),
-                Positioned(
-                  left: 60,
-                  top: 12,
-                  child: Center(
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Text(
+                        "Harga :",
+                        style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey[600]),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        "Rp ${formatRupiah(item.produk.price * item.qty)}",
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.azura,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(width: 16),
+
+            // Qty Controller Elegan
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.azura,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.azura.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Tombol Kurang
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(30),
+                      onTap: () {
+                        if (item.qty > 1) {
+                          onUpdateQty(item.qty - 1);
+                        } else {
+                          onRemove();
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(5),
+                        child: const Icon(Icons.remove, color: Colors.white, size: 20),
+                      ),
+                    ),
+                  ),
+
+                  // Jumlah
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Text(
                       "${item.qty}",
                       style: GoogleFonts.poppins(
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
-                        fontSize: 18,
                       ),
                     ),
                   ),
-                ),
-              ],
+
+                  // Tombol Tambah
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(30),
+                      onTap: () => onUpdateQty(item.qty + 1),
+                      child: Container(
+                        padding: const EdgeInsets.all(5),
+                        child: const Icon(Icons.add, color: Colors.white, size: 20),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

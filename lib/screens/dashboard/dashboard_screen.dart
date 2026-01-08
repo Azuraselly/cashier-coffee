@@ -6,6 +6,7 @@ import 'package:kasir/screens/dashboard/widgets/charts/line_chart_widget.dart';
 import 'package:kasir/screens/dashboard/widgets/charts/bar_chart_widget.dart';
 import 'package:kasir/component/sidebar_drawer.dart';
 import 'package:kasir/utils/constants.dart';
+import 'package:kasir/services/customer_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -17,8 +18,39 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedTab = 1;
+  final _service = CustomerService();
+  List<Map<String, dynamic>> _customers = [];
+  bool _isLoading = true; // Opsional, kalau mau tambah loading indicator
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCustomers();
+  }
+
+  Future<void> _fetchCustomers() async {
+    if (!mounted) return;
+    setState(() => _isLoading = true);
+    try {
+      final data = await _service.fetchAll();
+      if (mounted) {
+        setState(() {
+          _customers = data;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        // Opsional: tambah toast error kalau mau
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal memuat data pelanggan: $e')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,13 +172,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                     const SizedBox(width: 14),
                     Expanded(
-                      child: StatCard(
-                        icon: Icons.people_alt_rounded,
-                        value: '45',
-                        label: 'Pelanggan Aktif',
-                        iconColor: AppColors.azura,
+                        child: StatCard(
+                          icon: Icons.people_alt_rounded,
+                          value: _isLoading ? '-' : '${_customers.length}',
+                          label: 'Pelanggan Aktif',
+                          iconColor: AppColors.azura,
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),
